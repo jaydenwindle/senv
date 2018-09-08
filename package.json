@@ -1,6 +1,6 @@
 {
   "name": "senv",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A simple CLI tool for encrypting and decrypting .env files",
   "main": "index.js",
   "repository": "https://github.com/jaydenwindle/senv",
@@ -11,5 +11,16 @@
   "dependencies": {
     "commander": "^2.18.0",
     "envfile": "^2.3.0"
-  }
+  },
+  "keywords": [
+    "dotenv",
+    "secure dotenv",
+    "encrypted dotenv",
+    ".env",
+    "secure .env",
+    "encrypted .env",
+    "environment variable",
+    "encrypted environment variable",
+    "secure environment variable"
+  ]
 }
