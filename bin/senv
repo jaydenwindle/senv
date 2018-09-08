@@ -2,7 +2,7 @@
 
 const program = require('commander'),
       package = require('../package.json'),
-      eenv = require('../index');
+      senv = require('../index');
 
 program
     .version(package.version, '-v, --version')
@@ -15,10 +15,11 @@ program.command('encrypt <filename>')
     .option('-p, --password [password]', 'Password to encrypt file with')
     .action(function (filename, options) {
         try {
-            const result = eenv.encryptEnvFile(filename, options.output, options.password);
+            const result = senv.encryptEnvFile(filename, options.output, options.password);
             console.log(result);
         } catch (err) {
             console.error(`${ err }`);
+            console.error(`See ${package.name} encrypt --help for details.`);
             process.exit(1);
         }
     });
@@ -30,10 +31,11 @@ program.command('decrypt <filename>')
     .option('-p, --password [password]', 'Password to decrypt file with')
     .action(function (filename, options) {
         try {
-            const result = eenv.decryptEnvFile(filename, options.output, options.password)
+            const result = senv.decryptEnvFile(filename, options.output, options.password)
             console.log(result);
         } catch (err) {
             console.error(`${ err }`);
+            console.error(`See ${package.name} decrypt --help for details.`);
             process.exit(1);
         }
     });
@@ -54,10 +56,10 @@ function printHelp() {
     console.log('Examples:');
     console.log('')
     console.log('  Encrypt a plain text .env file:')
-    console.log('  $ eenv encrypt .env -o .env.enc -p password')
+    console.log(`  $ ${package.name} encrypt .env -o .env.enc -p password`)
     console.log('')
     console.log('  Decrypt an encrypted .env file:')
-    console.log('  $ eenv decrypt .env.enc -o .env -p password')
+    console.log(`  $ ${package.name} decrypt .env.enc -o .env -p password`)
 }
 
 if (!process.argv.slice(2).length) {

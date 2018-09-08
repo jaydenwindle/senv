@@ -40,8 +40,7 @@ function decryptString(text, password) {
 function encryptEnvFile(inputFile, outputFile, password) {
     if (!password) {
         throw new Error(
-            'No password provided.\
-            \nProvide a password using the -p flag (see `eenv encrypt --help` for details)'
+            'No password provided.'
         );
     }
     const envVariables = envfile.parseFileSync(inputFile);
@@ -75,8 +74,7 @@ function encryptEnvFile(inputFile, outputFile, password) {
 function decryptEnvFile(inputFile, outputFile, password) {
     if (!password) {
         throw new Error(
-            'No password provided.\
-            \nProvide a password using the -p flag (see `eenv decrypt --help` for details)'
+            'No password provided.'
         );
     }
     const envVariables = envfile.parseFileSync(inputFile);
