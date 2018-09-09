@@ -1,6 +1,6 @@
 {
   "name": "senv",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple CLI tool for encrypting and decrypting .env files",
   "main": "index.js",
   "repository": "https://github.com/jaydenwindle/senv",
