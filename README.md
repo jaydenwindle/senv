@@ -4,7 +4,7 @@ A simple CLI tool for encrypting and decrypting .env files.
 
 ## Basic Usage
 
-Installation:
+#### Installation:
 
 `$ yarn global add senv`
 
@@ -12,14 +12,14 @@ or
 
 `$ npm install -g senv`
 
-
-Encrypt a plain text .env file:
+#### Encrypt a plain text .env file:
 
 `$ senv encrypt .env -o .env.enc -p password`
 
-Decrypt an encrypted .env file:
+#### Decrypt an encrypted .env file:
 
 `$ senv decrypt .env.enc -o .env -p password`
+
 
 ## Advanced Usage
 
@@ -33,7 +33,9 @@ $ chmod +x .git/hooks/pre-commit
 #### Decrypt .env.env file in CI pipeline:
 - Add `$SENV_PASSWORD` environment variable via UI
 - Add the following line to your CI script:
-    `senv decrypt .env.enc -o .env -p $SENV_PASSWORD`
+
+`senv decrypt .env.enc -o .env -p $SENV_PASSWORD`
+
 
 ## Features:
 - 🔒 Encrypt and decrypt .env files so they can be securely tracked in Git
@@ -41,6 +43,7 @@ $ chmod +x .git/hooks/pre-commit
 - 🔢 Supports multiple .env files for different environment configurations
 - 🎮 Supports encryption and decryption via CLI tool
 - 🚢 Easy to configure for use with a CI system
+
 
 ## Why?
 
