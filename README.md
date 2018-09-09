@@ -1,5 +1,8 @@
 # 🔐 senv
 
+[![Build Status](https://travis-ci.org/jaydenwindle/senv.svg?branch=master)](https://travis-ci.org/jaydenwindle/senv)
+
+
 A simple CLI tool for encrypting and decrypting .env files.
 
 
