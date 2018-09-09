@@ -20,13 +20,11 @@ const PBKDF2_ITERATION_COUNT_STRING = 50000
  * @param {string=} name - the name of the variable
  */
 async function encryptString(string, key, iv, name) {
-    if(typeof key === "string")
-    {
+    if(typeof key === "string") {
         key = crypto.pbkdf2Sync(key, iv, PBKDF2_ITERATION_COUNT_STRING, 32, 'sha512');
     }
 
-    if(name)
-    {
+    if(name) {
         iv = Buffer.from(createHmac(iv, name).slice(0, 32), 'hex')
     }
 
@@ -45,13 +43,11 @@ async function encryptString(string, key, iv, name) {
  * @param {string=} name - the name of the variable
  */
 async function decryptString(string, key, iv, name) {
-    if(typeof key === "string")
-    {
+    if(typeof key === "string") {
         key = crypto.pbkdf2Sync(key, iv, PBKDF2_ITERATION_COUNT_STRING, 32, 'sha512');
     }
 
-    if(name)
-    {
+    if(name) {
         iv = Buffer.from(createHmac(iv, name).slice(0, 32), 'hex')
     }
 
