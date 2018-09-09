@@ -5,15 +5,28 @@ const crypto = require('crypto'),
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const HMAC_ALGORITHM = 'sha256';
 const AUTHENTICATION_KEY = 'SENV_AUTHENTICATION';
+const AUTHENTICATION_SALT = 'SENV_SALT'
+
+const PBKDF2_ITERATION_COUNT_FILE = 100000
+const PBKDF2_ITERATION_COUNT_STRING = 50000
 
 /**
  * Encrypts a string.
  * @param {string} string - The string to be encrypted.
- * @param {string} password - The password with which to encrypt the string.
+ * @param {string} key - The password with which to encrypt the string.
  * @param {string} iv - The IV with which to encrypt the string.
+ * @param {string=} name - the name of the variable
  */
-async function encryptString(string, password, iv) {
-    const key = crypto.pbkdf2Sync(password, iv, 10000, 32, 'sha512');
+async function encryptString(string, key, iv, name) {
+    if(typeof key === "string")
+    {
+        key = crypto.pbkdf2Sync(key, iv, PBKDF2_ITERATION_COUNT_STRING, 32, 'sha512');
+    }
+
+    if(name)
+    {
+        iv = Buffer.from(createHmac(iv, name).slice(0, 32), 'hex')
+    }
 
     const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, iv);
     let encrypted = cipher.update(string, 'utf8', 'hex');
@@ -25,11 +38,20 @@ async function encryptString(string, password, iv) {
 /**
  * Decrypts a string.
  * @param {string} string - The string to be decrypted.
- * @param {string} password - The password with which to decrypt the string.
+ * @param {string} key - The password with which to decrypt the string.
  * @param {string} iv - The IV with which to encrypt the string.
+ * @param {string=} name - the name of the variable
  */
-async function decryptString(string, password, iv) {
-    const key = crypto.pbkdf2Sync(password, iv, 10000, 32, 'sha512');
+async function decryptString(string, key, iv, name) {
+    if(typeof key === "string")
+    {
+        key = crypto.pbkdf2Sync(key, iv, PBKDF2_ITERATION_COUNT_STRING, 32, 'sha512');
+    }
+
+    if(name)
+    {
+        iv = Buffer.from(createHmac(iv, name).slice(0, 32), 'hex')
+    }
 
     const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, iv);
     let decrypted = decipher.update(string, 'hex', 'utf8');
@@ -68,17 +90,23 @@ async function encryptEnvFile(inputFile, outputFile, password) {
     }
     const envVariables = envfile.parseFileSync(inputFile);
 
-    const hmac = createHmac(JSON.stringify(envVariables), password);
-    const iv = hmac.slice(0, 16);
+    const salt = crypto.randomBytes(16)
+    const key = crypto.pbkdf2Sync(password, salt, PBKDF2_ITERATION_COUNT_FILE, 32, 'sha512');
+
+    const hmac = createHmac(JSON.stringify(envVariables), key);
+
+    // 32 because hex. (16 bytes)
+    const iv = Buffer.from(hmac.slice(0, 32), 'hex');
 
     for (const variableName in envVariables) {
         if (envVariables.hasOwnProperty(variableName)) {
             const value = envVariables[variableName];
-            envVariables[variableName] = await encryptString(value, password, iv);
+            envVariables[variableName] = await encryptString(value, key, iv, variableName);
         }
     }
 
     envVariables[AUTHENTICATION_KEY] = hmac;
+    envVariables[AUTHENTICATION_SALT] = salt.toString('hex');
 
     const encryptedEnvVariables = envfile.stringifySync(envVariables);
 
@@ -105,20 +133,27 @@ async function decryptEnvFile(inputFile, outputFile, password) {
             'No password provided.'
         );
     }
-    const envVariables = envfile.parseFileSync(inputFile);
-    const hmac = envVariables[AUTHENTICATION_KEY];
-    const iv = hmac.slice(0, 16);
 
+    const envVariables = envfile.parseFileSync(inputFile);
+    const salt = Buffer.from(envVariables[AUTHENTICATION_SALT], 'hex')
+    const key = crypto.pbkdf2Sync(password, salt, PBKDF2_ITERATION_COUNT_FILE, 32, 'sha512');
+    
+    const hmac = envVariables[AUTHENTICATION_KEY];
+
+    // 32 because hex. (16 bytes)
+    const iv = Buffer.from(hmac.slice(0, 32), 'hex');
+
+    delete envVariables[AUTHENTICATION_SALT]
     delete envVariables[AUTHENTICATION_KEY];
 
     for (const variableName in envVariables) {
         if (envVariables.hasOwnProperty(variableName)) {
             const encryptedValue = envVariables[variableName];
-            envVariables[variableName] = await decryptString(encryptedValue, password, iv);
+            envVariables[variableName] = await decryptString(encryptedValue, key, iv, variableName);
         }
     }
 
-    const calculatedHmac = createHmac(JSON.stringify(envVariables), password);
+    const calculatedHmac = createHmac(JSON.stringify(envVariables), key);
 
     if (hmac !== calculatedHmac) {
         throw new Error('Incorrect password provided.');
