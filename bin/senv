@@ -13,9 +13,9 @@ program.command('encrypt <filename>')
     .description('Encrypts a plain text .env file')
     .option('-o, --output [outfile]', 'Output file')
     .option('-p, --password [password]', 'Password to encrypt file with')
-    .action(function (filename, options) {
+    .action(async function (filename, options) {
         try {
-            const result = senv.encryptEnvFile(filename, options.output, options.password);
+            const result = await senv.encryptEnvFile(filename, options.output, options.password);
             console.log(result);
         } catch (err) {
             console.error(`${ err }`);
@@ -29,9 +29,9 @@ program.command('decrypt <filename>')
     .description('Decrypts an encrypted .env file')
     .option('-o, --output [outfile]', 'Output File')
     .option('-p, --password [password]', 'Password to decrypt file with')
-    .action(function (filename, options) {
+    .action(async function (filename, options) {
         try {
-            const result = senv.decryptEnvFile(filename, options.output, options.password)
+            const result = await senv.decryptEnvFile(filename, options.output, options.password)
             console.log(result);
         } catch (err) {
             console.error(`${ err }`);
