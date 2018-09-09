@@ -4,9 +4,9 @@ A simple CLI tool for encrypting and decrypting .env files.
 
 
 ## Features:
-- 🔒 Encrypt and decrypt .env files so they can be securely tracked in Git
+- 🔒 Encrypt and decrypt `.env` files so they can be securely tracked in Git
 - 👀 .env file changes are apparent during code review
-- 🔢 Supports multiple .env files for different environment configurations
+- 🔢 Supports multiple `.env` files for different environment configurations
 - 🎮 Supports encryption and decryption via CLI tool
 - 🚢 Easy to configure for use with a CI system
 
