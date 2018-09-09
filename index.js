@@ -13,7 +13,7 @@ const AUTHENTICATION_KEY = 'SENV_AUTHENTICATION';
  * @param {string} iv - The IV with which to encrypt the string.
  */
 async function encryptString(string, password, iv) {
-    const key = crypto.scryptSync(password, iv, 32);
+    const key = crypto.pbkdf2Sync(password, iv, 10000, 32, 'sha512');
 
     const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, iv);
     let encrypted = cipher.update(string, 'utf8', 'hex');
@@ -29,7 +29,7 @@ async function encryptString(string, password, iv) {
  * @param {string} iv - The IV with which to encrypt the string.
  */
 async function decryptString(string, password, iv) {
-    const key = crypto.scryptSync(password, iv, 32);
+    const key = crypto.pbkdf2Sync(password, iv, 10000, 32, 'sha512');
 
     const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, iv);
     let decrypted = decipher.update(string, 'hex', 'utf8');
