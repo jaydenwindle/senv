@@ -2,6 +2,15 @@
 
 A simple CLI tool for encrypting and decrypting .env files.
 
+
+## Features:
+- 🔒 Encrypt and decrypt .env files so they can be securely tracked in Git
+- 👀 .env file changes are apparent during code review
+- 🔢 Supports multiple .env files for different environment configurations
+- 🎮 Supports encryption and decryption via CLI tool
+- 🚢 Easy to configure for use with a CI system
+
+
 ## Basic Usage
 
 #### Installation:
@@ -35,14 +44,6 @@ $ chmod +x .git/hooks/pre-commit
 - Add the following line to your CI script:
 
 `senv decrypt .env.enc -o .env -p $SENV_PASSWORD`
-
-
-## Features:
-- 🔒 Encrypt and decrypt .env files so they can be securely tracked in Git
-- 👀 .env file changes are apparent during code review
-- 🔢 Supports multiple .env files for different environment configurations
-- 🎮 Supports encryption and decryption via CLI tool
-- 🚢 Easy to configure for use with a CI system
 
 
 ## Why?
