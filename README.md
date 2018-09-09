@@ -8,7 +8,7 @@ A simple CLI tool for encrypting and decrypting .env files.
 
 ## Features:
 - 🔒 Encrypt and decrypt `.env` files so they can be securely tracked in Git
-- 👀 .env file changes are apparent during code review
+- 👀 .env file changes are easily visible during code review
 - 🔢 Supports multiple `.env` files for different environment configurations
 - 🎮 Supports encryption and decryption via CLI tool
 - 🚢 Easy to configure for use with a CI system
@@ -47,7 +47,7 @@ There are several ways to store your passwords, depending on what works best wit
 your project's existing setup.
 
 #### One password for all `.env` files
-To configure `senv` to use a single password for all `.env` files you have two options.
+To configure `senv` to use a single password for all `.env` files you have two options:
 
 1) Set the `DOTENV_PASS` environment variable in your `~/.bash_profile`:
 ```
@@ -58,6 +58,9 @@ $ export DOTENV_PASS=your_password_here
 ```
 $ echo "your_password_here" >> .env.pass
 ```
+
+If both an environment variable and a password file are present, `senv` will default to using the
+environment variable.
 
 #### One password for each `.env` file
 `senv` will look for and use an environment variables or password file for each `.env` file based
@@ -71,6 +74,9 @@ $ senv decrypt .env.prod.enc        # Looks for $DOTENV_PROD_PASS or .env.prod.p
 $ senv decrypt .env.prod.encrypted  # Looks for $DOTENV_PROD_PASS or .env.prod.pass
 $ senv decrypt .env.prod.suffix     # Looks for $DOTENV_PROD_SUFFIX_PASS or .env.prod.suffix.pass
 ```
+
+If both an environment variable and a password file are present for an individual `.env` file,
+`senv` will default to using the environment variable.
 
 #### CLI Argument (insecure)
 You can also pass in your password as a command line argument, like so:
