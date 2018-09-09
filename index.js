@@ -99,4 +99,6 @@ function decryptEnvFile(inputFile, outputFile, password) {
 module.exports = {
     encryptEnvFile,
     decryptEnvFile,
+    encryptString,
+    decryptString,
 }

@@ -8,6 +8,10 @@
   "license": "MIT",
   "preferGlobal": true,
   "bin": "./bin/senv",
+  "scripts": {
+    "test": "jest .",
+    "coverage": "jest --coverage ."
+  },
   "dependencies": {
     "commander": "^2.18.0",
     "envfile": "^2.3.0"
@@ -22,5 +26,8 @@
     "environment variable",
     "encrypted environment variable",
     "secure environment variable"
-  ]
+  ],
+  "devDependencies": {
+    "jest": "^23.5.0"
+  }
 }
