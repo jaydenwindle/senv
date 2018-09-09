@@ -1,6 +1,8 @@
 const crypto = require('crypto'),
       envfile = require('envfile'),
-      writeFile = require('fs').writeFileSync;
+      writeFile = require('fs').writeFileSync,
+      readFile = require('fs').readFileSync;
+      exists = require('fs').existsSync;
 
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const HMAC_ALGORITHM = 'sha256';
@@ -52,6 +54,55 @@ function createHmac(string, password) {
 }
 
 /**
+ * Gets a password for decryption from various sources in order.
+ * @param {string} fileName - The file name to convert
+ * @returns {string}  - the corresponding password file name
+ */
+function getPasswordFromEnvironment(fileName) {
+    // Get password for individual .env file from environment variable
+    const individualPasswordEnvVarName = fileName
+        .replace('.encrypted', '') // ignore encrypted filename part
+        .replace('.enc', '') // ignore encrypted filename part
+        .replace('.', 'DOT') // replace first . with DOT
+        .replace(/\./g, '_') // replace all other . with _
+        .concat('_PASS')
+        .toUpperCase();
+
+    if (process.env[individualPasswordEnvVarName]) {
+        return process.env[individualPasswordEnvVarName];
+    }
+
+    // Get password for individual .env file from password file
+    const individualPasswordFileName = fileName
+        .replace('.encrypted', '') // ignore encrypted filename part
+        .replace('.enc', '') // ignore encrypted filename part
+        .concat('.pass');
+
+    if(exists(individualPasswordFileName)) {
+        return readFile(individualPasswordFileName, 'utf8');
+    }
+
+    // Get password for all .env files from environment variable
+    const globalPasswordEnvVarName = 'DOTENV_PASS';
+
+    if (process.env[globalPasswordEnvVarName]) {
+        return process.env[globalPasswordEnvVarName];
+    }
+
+    // Get password for all .env files from file
+    const globalPasswordFileName = '.env.pass';
+
+    if (exists(globalPasswordFileName)) {
+        return readFile(globalPasswordFileName, 'utf8');
+    }
+
+    // if no password found, throw error
+    throw new Error(
+        'No password provided.'
+    );
+}
+
+/**
  * Encrypts a .env file and writes it to disk.
  * @param {string} inputFile    - File path to plain text .env file to encrypt.
  * @param {string} outputFile   - File path to write encrypted .env file to.
@@ -61,11 +112,10 @@ function createHmac(string, password) {
  *                               returned as a string. Otherwise returns success message.
  */
 async function encryptEnvFile(inputFile, outputFile, password) {
-    if (!password) {
-        throw new Error(
-            'No password provided.'
-        );
+    if(!password) {
+        password = getPasswordFromEnvironment(inputFile);
     }
+
     const envVariables = envfile.parseFileSync(inputFile);
 
     const hmac = createHmac(JSON.stringify(envVariables), password);
@@ -100,11 +150,10 @@ async function encryptEnvFile(inputFile, outputFile, password) {
  *                               returned as a string. Otherwise returns success message.
  */
 async function decryptEnvFile(inputFile, outputFile, password) {
-    if (!password) {
-        throw new Error(
-            'No password provided.'
-        );
+    if(!password) {
+        password = getPasswordFromEnvironment(inputFile);
     }
+
     const envVariables = envfile.parseFileSync(inputFile);
     const hmac = envVariables[AUTHENTICATION_KEY];
     const iv = hmac.slice(0, 16);
@@ -139,4 +188,5 @@ module.exports = {
     decryptEnvFile,
     encryptString,
     decryptString,
+    getPasswordFromEnvironment,
 }

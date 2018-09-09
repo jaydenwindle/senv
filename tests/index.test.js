@@ -24,6 +24,52 @@ test('encrypts/decrypts string successfully', async () => {
     expect(await senv.decryptString(encryptedString, testPassword, iv)).toBe(testString);
 });
 
+test('gets individual .env file password from env var', async () => {
+    const password = 'password';
+    process.env.DOTENV_PROD_PASS = password;
+
+    expect(senv.getPasswordFromEnvironment('.env.prod')).toBe(password);
+    expect(senv.getPasswordFromEnvironment('.env.prod.enc')).toBe(password);
+    expect(senv.getPasswordFromEnvironment('.env.prod.encrypted')).toBe(password);
+
+    delete process.env.DOTENV_PROD_PASS;
+});
+
+test('gets individual .env file password from password file', async () => {
+    const password = 'password';
+    const path = '.env.prod.pass';
+    writeFile(path, password);
+
+    expect(senv.getPasswordFromEnvironment('.env.prod')).toBe(password);
+    expect(senv.getPasswordFromEnvironment('.env.prod.enc')).toBe(password);
+    expect(senv.getPasswordFromEnvironment('.env.prod.encrypted')).toBe(password);
+
+    remove(path);
+});
+
+test('gets global .env file password from env var', async () => {
+    const password = 'password';
+    process.env.DOTENV_PASS = password;
+
+    expect(senv.getPasswordFromEnvironment('.env.prod')).toBe(password);
+    expect(senv.getPasswordFromEnvironment('.env.prod.enc')).toBe(password);
+    expect(senv.getPasswordFromEnvironment('.env.prod.encrypted')).toBe(password);
+
+    delete process.env.DOTENV_PASS;
+});
+
+test('gets global .env file password from password file', async () => {
+    const password = 'password';
+    const path = '.env.pass';
+    writeFile(path, password);
+
+    expect(senv.getPasswordFromEnvironment('.env.prod')).toBe(password);
+    expect(senv.getPasswordFromEnvironment('.env.prod.enc')).toBe(password);
+    expect(senv.getPasswordFromEnvironment('.env.prod.encrypted')).toBe(password);
+
+    remove(path);
+});
+
 test('encrypting env file fails without password', () => {
     expect(senv.encryptEnvFile('path', undefined)).rejects.toThrow('password');
     expect(senv.encryptEnvFile('path', null)).rejects.toThrow('password');
