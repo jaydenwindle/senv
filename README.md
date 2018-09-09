@@ -11,15 +11,16 @@ A simple CLI tool for encrypting and decrypting .env files.
 - 🚢 Easy to configure for use with a CI system
 
 
-## Basic Usage
-
-#### Installation:
+## Installation:
 
 `$ yarn global add senv`
 
 or
 
 `$ npm install -g senv`
+
+
+## Basic Usage
 
 #### Encrypt a plain text .env file:
 
