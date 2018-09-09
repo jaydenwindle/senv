@@ -53,13 +53,15 @@ program.parse(process.argv);
 function printHelp() {
     program.outputHelp();
     console.log('');
+    console.log('Run `senv [command] --help` for more details about a command')
+    console.log('');
     console.log('Examples:');
     console.log('')
     console.log('  Encrypt a plain text .env file:')
-    console.log(`  $ ${package.name} encrypt .env -o .env.enc -p password`)
+    console.log(`  $ ${package.name} encrypt .env -o .env.enc`)
     console.log('')
     console.log('  Decrypt an encrypted .env file:')
-    console.log(`  $ ${package.name} decrypt .env.enc -o .env -p password`)
+    console.log(`  $ ${package.name} decrypt .env.enc -o .env`)
 }
 
 if (!process.argv.slice(2).length) {
