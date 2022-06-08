@@ -1,16 +1,16 @@
 const crypto = require('crypto'),
       envfile = require('envfile'),
       writeFile = require('fs').writeFileSync,
-      readFile = require('fs').readFileSync;
+      readFile = require('fs').readFileSync,
       exists = require('fs').existsSync;
 
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const HMAC_ALGORITHM = 'sha256';
 const AUTHENTICATION_KEY = 'SENV_AUTHENTICATION';
-const AUTHENTICATION_SALT = 'SENV_SALT'
+const AUTHENTICATION_SALT = 'SENV_SALT';
 
-const PBKDF2_ITERATION_COUNT_FILE = 100000
-const PBKDF2_ITERATION_COUNT_STRING = 50000
+const PBKDF2_ITERATION_COUNT_FILE = 100000;
+const PBKDF2_ITERATION_COUNT_STRING = 50000;
 
 /**
  * Encrypts a string.
@@ -25,7 +25,7 @@ async function encryptString(string, key, iv, name) {
     }
 
     if (name) {
-        iv = Buffer.from(createHmac(iv, name).slice(0, 32), 'hex')
+        iv = Buffer.from(createHmac(iv, name).slice(0, 32), 'hex');
     }
 
     const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, iv);
@@ -48,7 +48,7 @@ async function decryptString(string, key, iv, name) {
     }
 
     if (name) {
-        iv = Buffer.from(createHmac(iv, name).slice(0, 32), 'hex')
+        iv = Buffer.from(createHmac(iv, name).slice(0, 32), 'hex');
     }
 
     const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, iv);
@@ -62,7 +62,7 @@ async function decryptString(string, key, iv, name) {
  * Creates an HMAC from a string and password.
  * @param {string} string - The string to with which to create the HMAC.
  * @param {string} password - The password with which to create the HMAC.
- * 
+ *
  * @returns {string}  - The created HMAC.
  */
 function createHmac(string, password) {
@@ -125,7 +125,7 @@ function getPasswordFromEnvironment(fileName) {
  * @param {string} inputFile    - File path to plain text .env file to encrypt.
  * @param {string} outputFile   - File path to write encrypted .env file to.
  * @param {string} password     - The password with which to encrypt the .env file.
- * 
+ *
  * @return {string}            - If outputFile is undefined, encrypted .env contents will be
  *                               returned as a string. Otherwise returns success message.
  */
@@ -136,7 +136,7 @@ async function encryptEnvFile(inputFile, outputFile, password) {
 
     const envVariables = envfile.parseFileSync(inputFile);
 
-    const salt = crypto.randomBytes(16)
+    const salt = crypto.randomBytes(16);
     const key = crypto.pbkdf2Sync(password, salt, PBKDF2_ITERATION_COUNT_FILE, 32, 'sha512');
 
     const hmac = createHmac(JSON.stringify(envVariables), key);
@@ -158,7 +158,7 @@ async function encryptEnvFile(inputFile, outputFile, password) {
 
     if (outputFile) {
         writeFile(outputFile, encryptedEnvVariables);
-        return `Encrypted file successfully written to ${outputFile}`
+        return `Encrypted file successfully written to ${outputFile}`;
     } else {
         return encryptedEnvVariables;
     }
@@ -169,7 +169,7 @@ async function encryptEnvFile(inputFile, outputFile, password) {
  * @param {string} inputFile    - Path to encrypted .env file to decrypt.
  * @param {string} outputFile   - Path to write decrypted .env file to.
  * @param {string} password     - The password with which to decrypt the .env file.
- * 
+ *
  * @return {string}            - If outputFile is undefined, encrypted .env contents will be
  *                               returned as a string. Otherwise returns success message.
  */
@@ -179,15 +179,15 @@ async function decryptEnvFile(inputFile, outputFile, password) {
     }
 
     const envVariables = envfile.parseFileSync(inputFile);
-    const salt = Buffer.from(envVariables[AUTHENTICATION_SALT], 'hex')
+    const salt = Buffer.from(envVariables[AUTHENTICATION_SALT], 'hex');
     const key = crypto.pbkdf2Sync(password, salt, PBKDF2_ITERATION_COUNT_FILE, 32, 'sha512');
-    
+
     const hmac = envVariables[AUTHENTICATION_KEY];
 
     // 32 because hex. (16 bytes)
     const iv = Buffer.from(hmac.slice(0, 32), 'hex');
 
-    delete envVariables[AUTHENTICATION_SALT]
+    delete envVariables[AUTHENTICATION_SALT];
     delete envVariables[AUTHENTICATION_KEY];
 
     for (const variableName in envVariables) {
@@ -207,7 +207,7 @@ async function decryptEnvFile(inputFile, outputFile, password) {
 
     if (outputFile) {
         writeFile(outputFile, decryptedEnvVariables);
-        return `Decrypted file successfully written to ${outputFile}`
+        return `Decrypted file successfully written to ${outputFile}`;
     } else {
         return decryptedEnvVariables;
     }
